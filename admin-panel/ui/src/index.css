@@ -1,0 +1,247 @@
+@import "tailwindcss";
+
+/* Corporate Enterprise Warm Theme - Cream/Stone Palette */
+:root {
+  --background: 30 6% 96%;           /* stone-100 warm gray */
+  --foreground: 20 14.3% 4.1%;       /* stone-950 near black */
+  --card: 60 9% 97.8%;               /* stone-50 cream white */
+  --card-foreground: 20 14.3% 4.1%;  /* stone-950 */
+  --primary: 217.2 91.2% 59.8%;      /* blue-500 */
+  --primary-foreground: 0 0% 100%;   /* white */
+  --secondary: 30 6% 96%;            /* stone-100 */
+  --secondary-foreground: 24 9.8% 10%; /* stone-900 */
+  --muted: 60 4.8% 95.9%;            /* stone-100 */
+  --muted-foreground: 25 5.3% 44.7%; /* stone-500 */
+  --accent: 60 4.8% 95.9%;           /* stone-100 */
+  --accent-foreground: 24 9.8% 10%;  /* stone-900 */
+  --destructive: 0 84.2% 60.2%;      /* red-500 */
+  --destructive-foreground: 0 0% 100%;
+  --border: 20 5.9% 90%;             /* stone-200 */
+  --ring: 217.2 91.2% 59.8%;         /* blue-500 */
+
+  /* Status colors */
+  --success: 160 84% 39.4%;          /* emerald-500 */
+  --warning: 38 92% 50%;             /* amber-500 */
+  --error: 0 84.2% 60.2%;            /* red-500 */
+  --info: 217.2 91.2% 59.8%;         /* blue-500 */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  background-color: #f5f5f4;         /* stone-100 - warm gray */
+  color: #1c1917;                    /* stone-900 */
+  min-height: 100vh;
+}
+
+/* Scrollbar styling - Warm theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f5f5f4;               /* stone-100 */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #a8a29e;               /* stone-400 */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #78716c;               /* stone-500 */
+}
+
+/* Tremor overrides for warm cream theme */
+.tremor-Card-root {
+  background-color: #fafaf9 !important;   /* stone-50 cream */
+  border-color: #e7e5e4 !important;       /* stone-200 */
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08) !important;
+}
+
+.tremor-Title-root {
+  color: #1c1917 !important;              /* stone-900 */
+}
+
+.tremor-Text-root {
+  color: #57534e !important;              /* stone-600 */
+}
+
+.tremor-TableCell-root,
+.tremor-TableHeaderCell-root {
+  border-color: #e7e5e4 !important;       /* stone-200 */
+}
+
+.tremor-TableRow-root:hover {
+  background-color: #fafaf9 !important;   /* stone-50 */
+}
+
+/* Select/Input overrides - cream background */
+.tremor-SelectTrigger-root,
+.tremor-TextInput-root {
+  background-color: #f5f5f4 !important;   /* stone-100 */
+  border-color: #d6d3d1 !important;       /* stone-300 */
+  color: #1c1917 !important;              /* stone-900 */
+}
+
+.tremor-SelectTrigger-root:hover,
+.tremor-TextInput-root:hover {
+  border-color: #a8a29e !important;       /* stone-400 */
+}
+
+.tremor-SelectTrigger-root:focus,
+.tremor-TextInput-root:focus {
+  border-color: #3b82f6 !important;       /* blue-500 */
+  ring-color: #3b82f6 !important;
+}
+
+/* Metric styling */
+.tremor-Metric-root {
+  color: #1c1917 !important;              /* stone-900 */
+}
+
+/* Badge overrides - TRADITIONAL STATUS COLORS */
+/* Green for online/success/active */
+.tremor-Badge-root[data-color="emerald"],
+.tremor-Badge-root[data-color="green"] {
+  background-color: rgba(16, 185, 129, 0.1) !important;   /* emerald-500/10 */
+  color: rgb(5, 150, 105) !important;                      /* emerald-600 */
+}
+
+/* Red for offline/error/blocked */
+.tremor-Badge-root[data-color="red"] {
+  background-color: rgba(239, 68, 68, 0.1) !important;    /* red-500/10 */
+  color: rgb(220, 38, 38) !important;                      /* red-600 */
+}
+
+/* Amber for warning/pending */
+.tremor-Badge-root[data-color="amber"],
+.tremor-Badge-root[data-color="yellow"] {
+  background-color: rgba(245, 158, 11, 0.1) !important;   /* amber-500/10 */
+  color: rgb(217, 119, 6) !important;                      /* amber-600 */
+}
+
+/* Blue for info/neutral */
+.tremor-Badge-root[data-color="blue"] {
+  background-color: rgba(59, 130, 246, 0.1) !important;   /* blue-500/10 */
+  color: rgb(37, 99, 235) !important;                      /* blue-600 */
+}
+
+/* Gray for disabled/inactive */
+.tremor-Badge-root[data-color="gray"] {
+  background-color: rgba(120, 113, 108, 0.1) !important;  /* stone-500/10 */
+  color: rgb(87, 83, 78) !important;                       /* stone-600 */
+}
+
+/* Teal for data/communication */
+.tremor-Badge-root[data-color="teal"],
+.tremor-Badge-root[data-color="cyan"] {
+  background-color: rgba(20, 184, 166, 0.1) !important;   /* teal-500/10 */
+  color: rgb(13, 148, 136) !important;                     /* teal-600 */
+}
+
+/* Chart styling - Corporate colors */
+.tremor-AreaChart-root,
+.tremor-BarChart-root {
+  color: #1c1917 !important;              /* stone-900 */
+}
+
+/* ProgressBar colors */
+.tremor-ProgressBar-root [data-color="emerald"],
+.tremor-ProgressBar-root [data-color="green"] {
+  background-color: #10b981 !important;   /* emerald-500 */
+}
+
+.tremor-ProgressBar-root [data-color="red"] {
+  background-color: #ef4444 !important;   /* red-500 */
+}
+
+.tremor-ProgressBar-root [data-color="amber"] {
+  background-color: #f59e0b !important;   /* amber-500 */
+}
+
+.tremor-ProgressBar-root [data-color="blue"] {
+  background-color: #3b82f6 !important;   /* blue-500 */
+}
+
+/* Focus ring styling */
+*:focus-visible {
+  outline: 2px solid #3b82f6;             /* blue-500 */
+  outline-offset: 2px;
+}
+
+/* Smooth transitions */
+button, a, input, select, textarea {
+  transition: all 0.15s ease;
+}
+
+/* Fix Tremor Grid spacing to prevent overlap */
+.tremor-Grid-root {
+  display: grid !important;
+  gap: 1rem !important;
+}
+
+/* Ensure cards don't overlap */
+.tremor-Card-root {
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Fix table container to prevent horizontal overflow */
+.tremor-Table-root {
+  overflow-x: auto !important;
+}
+
+/* Ensure proper modal z-index */
+[class*="fixed"][class*="inset-0"] {
+  z-index: 50 !important;
+}
+
+/* Fix Flex container alignment */
+.tremor-Flex-root {
+  display: flex !important;
+}
+
+/* Prevent text overflow in cells */
+.tremor-TableCell-root {
+  max-width: 300px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* Override any problematic negative margins */
+.space-y-6 > * + * {
+  margin-top: 1.5rem !important;
+}
+
+.gap-4 {
+  gap: 1rem !important;
+}
+
+.gap-6 {
+  gap: 1.5rem !important;
+}
+
+/* Ensure proper stacking context */
+main {
+  position: relative !important;
+  z-index: 0 !important;
+}
+
+aside {
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+header {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 20 !important;
+}

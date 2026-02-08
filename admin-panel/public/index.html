@@ -1,0 +1,2069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Monitor - Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #1e293b;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #f8fafc;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #1e293b;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+        }
+
+        .status-dot.offline {
+            background: #ef4444;
+        }
+
+        /* Tabs - scrollable */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 10px 18px;
+            background: #1e293b;
+            border: none;
+            border-radius: 8px;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            background: #334155;
+            color: #f8fafc;
+        }
+
+        .tab.active {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .tab.danger {
+            background: #7f1d1d;
+        }
+
+        .tab.danger.active {
+            background: #ef4444;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #334155;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #f8fafc;
+        }
+
+        .agent-card {
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .agent-card:hover {
+            transform: translateY(-2px);
+            border-color: #3b82f6;
+        }
+
+        .agent-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            background: #0f172a;
+        }
+
+        .agent-status.online {
+            color: #22c55e;
+        }
+
+        .agent-status.offline {
+            color: #ef4444;
+        }
+
+        .agent-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .agent-info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+        }
+
+        .agent-info-label {
+            color: #64748b;
+        }
+
+        .agent-info-value {
+            color: #cbd5e1;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-success {
+            background: #22c55e;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 900px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            color: #f8fafc;
+        }
+
+        /* Data Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #334155;
+        }
+
+        .data-table th {
+            background: #0f172a;
+            color: #94a3b8;
+            font-weight: 500;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .data-table td {
+            font-size: 13px;
+            color: #e2e8f0;
+        }
+
+        .data-table tr:hover {
+            background: #334155;
+        }
+
+        /* Activity Chart */
+        .activity-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .activity-name {
+            width: 150px;
+            font-size: 13px;
+            color: #cbd5e1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .activity-progress {
+            flex: 1;
+            height: 24px;
+            background: #0f172a;
+            border-radius: 4px;
+            margin: 0 15px;
+            overflow: hidden;
+        }
+
+        .activity-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .activity-time {
+            width: 80px;
+            font-size: 13px;
+            color: #94a3b8;
+            text-align: right;
+        }
+
+        /* Screenshots Grid */
+        .screenshots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .screenshot-item {
+            position: relative;
+            cursor: pointer;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .screenshot-item:hover {
+            border-color: #3b82f6;
+        }
+
+        .screenshot-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .screenshot-time {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 8px;
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        /* Log Items */
+        .log-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            background: #0f172a;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .log-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .log-details {
+            flex: 1;
+        }
+
+        .log-title {
+            font-size: 14px;
+            color: #f8fafc;
+        }
+
+        .log-subtitle {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* Alert Badges */
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .badge-critical {
+            background: #7f1d1d;
+            color: #fca5a5;
+        }
+
+        .badge-high {
+            background: #78350f;
+            color: #fcd34d;
+        }
+
+        .badge-medium {
+            background: #1e3a5f;
+            color: #93c5fd;
+        }
+
+        .badge-low {
+            background: #14532d;
+            color: #86efac;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #334155;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #f8fafc;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .stat-change.positive {
+            color: #22c55e;
+        }
+
+        .stat-change.negative {
+            color: #ef4444;
+        }
+
+        /* Productivity Score */
+        .productivity-score {
+            font-size: 48px;
+            font-weight: 700;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .grade-A { color: #22c55e; }
+        .grade-B { color: #84cc16; }
+        .grade-C { color: #f59e0b; }
+        .grade-D { color: #f97316; }
+        .grade-F { color: #ef4444; }
+
+        /* Policy Item */
+        .policy-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #0f172a;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .policy-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .policy-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #f8fafc;
+        }
+
+        .policy-target {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* Toggle Switch */
+        .toggle {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #ef4444;
+            border-radius: 26px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle input:checked + .toggle-slider {
+            background: #22c55e;
+        }
+
+        .toggle input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #94a3b8;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 10px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #f8fafc;
+            font-size: 14px;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #1e293b;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .notification.success {
+            border-left-color: #22c55e;
+        }
+
+        .notification.error {
+            border-left-color: #ef4444;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filters select, .filters input {
+            padding: 8px 12px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #f8fafc;
+            font-size: 13px;
+        }
+
+        /* Risk Score Bar */
+        .risk-bar {
+            width: 100%;
+            height: 8px;
+            background: #0f172a;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .risk-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .risk-low { background: #22c55e; }
+        .risk-medium { background: #f59e0b; }
+        .risk-high { background: #ef4444; }
+
+        /* Scrollable content */
+        .scroll-content {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Employee Monitor</h1>
+            <div class="status-badge">
+                <span class="status-dot" id="serverStatus"></span>
+                <span id="serverStatusText">Connected</span>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="dashboard">Dashboard</button>
+            <button class="tab" data-tab="activity">Activity</button>
+            <button class="tab" data-tab="screenshots">Screenshots</button>
+            <button class="tab" data-tab="keystrokes">Keystrokes</button>
+            <button class="tab" data-tab="clipboard">Clipboard</button>
+            <button class="tab" data-tab="webhistory">Web History</button>
+            <button class="tab" data-tab="files">Files</button>
+            <button class="tab" data-tab="printjobs">Print Jobs</button>
+            <button class="tab" data-tab="usb">USB</button>
+            <button class="tab" data-tab="appblock">App Blocker</button>
+            <button class="tab" data-tab="webblock">Website Blocker</button>
+            <button class="tab" data-tab="logins">Logins</button>
+            <button class="tab" data-tab="timetrack">Time Track</button>
+            <button class="tab" data-tab="comms">Communications</button>
+            <button class="tab" data-tab="productivity">Productivity</button>
+            <button class="tab danger" data-tab="alerts">Alerts</button>
+            <button class="tab danger" data-tab="dlp">DLP</button>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalAgents">0</div>
+                    <div class="stat-label">Total Agents</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="onlineAgents">0</div>
+                    <div class="stat-label">Online Now</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="todayAlerts">0</div>
+                    <div class="stat-label">Alerts Today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgProductivity">--</div>
+                    <div class="stat-label">Avg Productivity</div>
+                </div>
+            </div>
+            <div class="grid" id="agentsList">
+                <div class="empty-state">
+                    <h3>No Agents Connected</h3>
+                    <p>Install the agent on employee machines to start monitoring</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Tab -->
+        <div id="activity" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Application Activity</h3>
+                    <div class="filters">
+                        <select id="activityAgentFilter" onchange="loadActivities()">
+                            <option value="">All Agents</option>
+                        </select>
+                        <input type="date" id="activityDateFilter" onchange="loadActivities()">
+                    </div>
+                </div>
+                <div class="scroll-content" id="activityList"></div>
+            </div>
+        </div>
+
+        <!-- Screenshots Tab -->
+        <div id="screenshots" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Recent Screenshots</h3>
+                    <select id="screenshotAgentFilter" onchange="loadScreenshots()">
+                        <option value="">All Agents</option>
+                    </select>
+                </div>
+                <div class="screenshots-grid" id="screenshotsList"></div>
+            </div>
+        </div>
+
+        <!-- Keystrokes Tab -->
+        <div id="keystrokes" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Keystroke Logs</h3>
+                    <div class="filters">
+                        <select id="keystrokeAgentFilter" onchange="loadKeystrokes()">
+                            <option value="">All Agents</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="scroll-content" id="keystrokesList"></div>
+            </div>
+        </div>
+
+        <!-- Clipboard Tab -->
+        <div id="clipboard" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Clipboard History</h3>
+                    <select id="clipboardAgentFilter" onchange="loadClipboard()">
+                        <option value="">All Agents</option>
+                    </select>
+                </div>
+                <div class="scroll-content" id="clipboardList"></div>
+            </div>
+        </div>
+
+        <!-- Web History Tab -->
+        <div id="webhistory" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Browser History</h3>
+                    <select id="webAgentFilter" onchange="loadWebHistory()">
+                        <option value="">All Agents</option>
+                    </select>
+                </div>
+                <div class="scroll-content" id="webHistoryList"></div>
+            </div>
+        </div>
+
+        <!-- Files Tab -->
+        <div id="files" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">File Activity</h3>
+                    <select id="fileAgentFilter" onchange="loadFileEvents()">
+                        <option value="">All Agents</option>
+                    </select>
+                </div>
+                <div class="scroll-content" id="fileEventsList"></div>
+            </div>
+        </div>
+
+        <!-- Print Jobs Tab -->
+        <div id="printjobs" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Print Jobs</h3>
+                    <select id="printAgentFilter" onchange="loadPrintJobs()">
+                        <option value="">All Agents</option>
+                    </select>
+                </div>
+                <div class="scroll-content" id="printJobsList"></div>
+            </div>
+        </div>
+
+        <!-- USB Tab -->
+        <div id="usb" class="tab-content" style="display: none;">
+            <div class="grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">USB Policies</h3>
+                        <button class="btn btn-primary btn-sm" onclick="showAddUSBPolicyModal()">Add Policy</button>
+                    </div>
+                    <div id="usbPoliciesList"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">USB Activity Logs</h3>
+                    </div>
+                    <div class="scroll-content" id="usbLogsList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- App Blocker Tab -->
+        <div id="appblock" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Blocked Applications</h3>
+                    <button class="btn btn-danger btn-sm" onclick="showBlockAppModal()">Block App</button>
+                </div>
+                <div id="blockedAppsList"></div>
+            </div>
+        </div>
+
+        <!-- Website Blocker Tab -->
+        <div id="webblock" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Blocked Websites</h3>
+                    <button class="btn btn-danger btn-sm" onclick="showBlockWebsiteModal()">Block Website</button>
+                </div>
+                <div id="blockedWebsitesList"></div>
+            </div>
+        </div>
+
+        <!-- Logins Tab -->
+        <div id="logins" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Login Events</h3>
+                    <select id="loginAgentFilter" onchange="loadLoginEvents()">
+                        <option value="">All Agents</option>
+                    </select>
+                </div>
+                <div class="scroll-content" id="loginEventsList"></div>
+            </div>
+        </div>
+
+        <!-- Time Track Tab -->
+        <div id="timetrack" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Time Entries</h3>
+                    <select id="timeAgentFilter" onchange="loadTimeEntries()">
+                        <option value="">All Agents</option>
+                    </select>
+                </div>
+                <div class="scroll-content" id="timeEntriesList"></div>
+            </div>
+        </div>
+
+        <!-- Communications Tab -->
+        <div id="comms" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Communication Events</h3>
+                    <select id="commAgentFilter" onchange="loadCommEvents()">
+                        <option value="">All Agents</option>
+                    </select>
+                </div>
+                <div class="scroll-content" id="commEventsList"></div>
+            </div>
+        </div>
+
+        <!-- Productivity Tab -->
+        <div id="productivity" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Productivity Scores</h3>
+                    <select id="prodAgentFilter" onchange="loadProductivity()">
+                        <option value="">All Agents</option>
+                    </select>
+                </div>
+                <div id="productivityList"></div>
+            </div>
+        </div>
+
+        <!-- Alerts Tab -->
+        <div id="alerts" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Security Alerts</h3>
+                    <select id="alertAgentFilter" onchange="loadAlerts()">
+                        <option value="">All Agents</option>
+                    </select>
+                </div>
+                <div class="scroll-content" id="alertsList"></div>
+            </div>
+        </div>
+
+        <!-- DLP Tab -->
+        <div id="dlp" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Data Loss Prevention Alerts</h3>
+                    <select id="dlpAgentFilter" onchange="loadDLPEvents()">
+                        <option value="">All Agents</option>
+                    </select>
+                </div>
+                <div class="scroll-content" id="dlpEventsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agent Detail Modal -->
+    <div class="modal" id="agentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalAgentName">Agent Details</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="tabs" style="margin-bottom: 20px;">
+                <button class="tab active" data-modal-tab="activity">Activity</button>
+                <button class="tab" data-modal-tab="agent-screenshots">Screenshots</button>
+            </div>
+            <div id="modalActivity" class="modal-tab-content">
+                <div id="activityChart"></div>
+            </div>
+            <div id="modalScreenshots" class="modal-tab-content" style="display: none;">
+                <div class="actions" style="margin-bottom: 20px;">
+                    <button class="btn btn-primary" onclick="requestScreenshot()">Request Screenshot</button>
+                </div>
+                <div class="screenshots-grid" id="agentScreenshots"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- USB Policy Modal -->
+    <div class="modal" id="usbPolicyModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>Add USB Policy</h2>
+                <button class="modal-close" onclick="closeUSBPolicyModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Device Type</label>
+                <select id="usbPolicyDeviceClass" class="form-select">
+                    <option value="storage">USB Storage Devices</option>
+                    <option value="phone">Mobile Phones</option>
+                    <option value="all">All USB Devices</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Apply To</label>
+                <select id="usbPolicyAgent" class="form-select">
+                    <option value="">All Agents</option>
+                </select>
+            </div>
+            <div class="form-group" style="display: flex; align-items: center; justify-content: space-between;">
+                <span class="form-label" style="margin: 0;">Allow Device</span>
+                <label class="toggle">
+                    <input type="checkbox" id="usbPolicyAllowed" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="saveUSBPolicy()">Save Policy</button>
+        </div>
+    </div>
+
+    <!-- Block App Modal -->
+    <div class="modal" id="blockAppModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>Block Application</h2>
+                <button class="modal-close" onclick="closeBlockAppModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Application Name (e.g., notepad.exe)</label>
+                <input type="text" id="blockAppName" class="form-input" placeholder="application.exe">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Apply To</label>
+                <select id="blockAppAgent" class="form-select">
+                    <option value="">All Agents</option>
+                </select>
+            </div>
+            <button class="btn btn-danger" style="width: 100%;" onclick="saveBlockedApp()">Block Application</button>
+        </div>
+    </div>
+
+    <!-- Block Website Modal -->
+    <div class="modal" id="blockWebsiteModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2>Block Website</h2>
+                <button class="modal-close" onclick="closeBlockWebsiteModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Website Domain (e.g., facebook.com)</label>
+                <input type="text" id="blockWebsiteDomain" class="form-input" placeholder="example.com">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Apply To</label>
+                <select id="blockWebsiteAgent" class="form-select">
+                    <option value="">All Agents</option>
+                </select>
+            </div>
+            <button class="btn btn-danger" style="width: 100%;" onclick="saveBlockedWebsite()">Block Website</button>
+        </div>
+    </div>
+
+    <!-- Screenshot Viewer Modal -->
+    <div class="modal" id="screenshotModal">
+        <div class="modal-content" style="max-width: 1200px;">
+            <div class="modal-header">
+                <h2 id="screenshotModalTitle">Screenshot</h2>
+                <button class="modal-close" onclick="closeScreenshotModal()">&times;</button>
+            </div>
+            <img id="screenshotModalImage" style="width: 100%; border-radius: 8px;">
+        </div>
+    </div>
+
+    <script>
+        const API_URL = `${window.location.protocol}//${window.location.host}/api`;
+        const WS_URL = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws`;
+
+        let ws;
+        let currentAgentId = null;
+        let agents = [];
+
+        // Initialize WebSocket
+        function initWebSocket() {
+            ws = new WebSocket(WS_URL);
+
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+                document.getElementById('serverStatus').classList.remove('offline');
+                document.getElementById('serverStatusText').textContent = 'Connected';
+                ws.send(JSON.stringify({ type: 'admin_connect' }));
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket disconnected');
+                document.getElementById('serverStatus').classList.add('offline');
+                document.getElementById('serverStatusText').textContent = 'Disconnected';
+                setTimeout(initWebSocket, 3000);
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data);
+            };
+        }
+
+        function handleWebSocketMessage(data) {
+            switch (data.type) {
+                case 'agents_list':
+                    agents = data.agents;
+                    renderAgents();
+                    updateAgentFilters();
+                    break;
+                case 'agent_connected':
+                    showNotification(`Agent connected`, 'success');
+                    loadAgents();
+                    break;
+                case 'agent_disconnected':
+                    showNotification(`Agent disconnected`, 'error');
+                    loadAgents();
+                    break;
+                case 'screenshot_ready':
+                    showNotification('Screenshot received', 'success');
+                    if (currentAgentId === data.agent_id) {
+                        loadAgentScreenshots(data.agent_id);
+                    }
+                    loadScreenshots();
+                    break;
+                case 'usb_event':
+                    showNotification(`USB: ${data.event.device_name} ${data.event.action}`, 'info');
+                    loadUSBLogs();
+                    break;
+                case 'alert':
+                    showNotification(`Alert: ${data.alert.rule_name}`, 'error');
+                    loadAlerts();
+                    break;
+            }
+        }
+
+        // API Functions
+        async function loadAgents() {
+            try {
+                const response = await fetch(`${API_URL}/agents`);
+                agents = await response.json();
+                renderAgents();
+                updateAgentFilters();
+                updateDashboardStats();
+            } catch (error) {
+                console.error('Error loading agents:', error);
+            }
+        }
+
+        function updateDashboardStats() {
+            document.getElementById('totalAgents').textContent = agents.length;
+            document.getElementById('onlineAgents').textContent = agents.filter(a => a.status === 'online').length;
+        }
+
+        function updateAgentFilters() {
+            const selects = document.querySelectorAll('select[id$="AgentFilter"], select[id$="Agent"]');
+            selects.forEach(select => {
+                const currentValue = select.value;
+                const firstOption = select.querySelector('option:first-child');
+                select.innerHTML = '';
+                select.appendChild(firstOption);
+                agents.forEach(agent => {
+                    const option = document.createElement('option');
+                    option.value = agent.id;
+                    option.textContent = agent.employee_name || agent.pc_name;
+                    select.appendChild(option);
+                });
+                select.value = currentValue;
+            });
+        }
+
+        async function loadScreenshots() {
+            try {
+                const agentId = document.getElementById('screenshotAgentFilter')?.value || '';
+                const url = agentId ? `${API_URL}/screenshots/agent/${agentId}?limit=50` : `${API_URL}/screenshots?limit=50`;
+                const response = await fetch(url);
+                const data = await response.json();
+                renderScreenshots(data.screenshots || data, 'screenshotsList');
+            } catch (error) {
+                console.error('Error loading screenshots:', error);
+            }
+        }
+
+        async function loadActivities() {
+            try {
+                const agentId = document.getElementById('activityAgentFilter')?.value || '';
+                const date = document.getElementById('activityDateFilter')?.value || '';
+                let url = `${API_URL}/monitoring/activities?limit=100`;
+                if (agentId) url += `&agent_id=${agentId}`;
+                const response = await fetch(url);
+                const activities = await response.json();
+                renderActivities(activities);
+            } catch (error) {
+                console.error('Error loading activities:', error);
+            }
+        }
+
+        async function loadKeystrokes() {
+            try {
+                const agentId = document.getElementById('keystrokeAgentFilter')?.value || '';
+                let url = `${API_URL}/monitoring/keystrokes?limit=100`;
+                if (agentId) url += `&agent_id=${agentId}`;
+                const response = await fetch(url);
+                const keystrokes = await response.json();
+                renderKeystrokes(keystrokes);
+            } catch (error) {
+                console.error('Error loading keystrokes:', error);
+            }
+        }
+
+        async function loadClipboard() {
+            try {
+                const agentId = document.getElementById('clipboardAgentFilter')?.value || '';
+                let url = `${API_URL}/monitoring/clipboard?limit=100`;
+                if (agentId) url += `&agent_id=${agentId}`;
+                const response = await fetch(url);
+                const clipboard = await response.json();
+                renderClipboard(clipboard);
+            } catch (error) {
+                console.error('Error loading clipboard:', error);
+            }
+        }
+
+        async function loadWebHistory() {
+            try {
+                const agentId = document.getElementById('webAgentFilter')?.value || '';
+                let url = `${API_URL}/monitoring/web-history?limit=100`;
+                if (agentId) url += `&agent_id=${agentId}`;
+                const response = await fetch(url);
+                const history = await response.json();
+                renderWebHistory(history);
+            } catch (error) {
+                console.error('Error loading web history:', error);
+            }
+        }
+
+        async function loadFileEvents() {
+            try {
+                const agentId = document.getElementById('fileAgentFilter')?.value || '';
+                let url = `${API_URL}/monitoring/file-events?limit=100`;
+                if (agentId) url += `&agent_id=${agentId}`;
+                const response = await fetch(url);
+                const events = await response.json();
+                renderFileEvents(events);
+            } catch (error) {
+                console.error('Error loading file events:', error);
+            }
+        }
+
+        async function loadPrintJobs() {
+            try {
+                const agentId = document.getElementById('printAgentFilter')?.value || '';
+                let url = `${API_URL}/monitoring/print-jobs?limit=100`;
+                if (agentId) url += `&agent_id=${agentId}`;
+                const response = await fetch(url);
+                const jobs = await response.json();
+                renderPrintJobs(jobs);
+            } catch (error) {
+                console.error('Error loading print jobs:', error);
+            }
+        }
+
+        async function loadUSBPolicies() {
+            try {
+                const response = await fetch(`${API_URL}/usb/policies`);
+                const policies = await response.json();
+                renderUSBPolicies(policies);
+            } catch (error) {
+                console.error('Error loading USB policies:', error);
+            }
+        }
+
+        async function loadUSBLogs() {
+            try {
+                const response = await fetch(`${API_URL}/usb/logs?limit=50`);
+                const logs = await response.json();
+                renderUSBLogs(logs);
+            } catch (error) {
+                console.error('Error loading USB logs:', error);
+            }
+        }
+
+        async function loadBlockedApps() {
+            try {
+                const response = await fetch(`${API_URL}/monitoring/blocked-apps`);
+                const apps = await response.json();
+                renderBlockedApps(apps);
+            } catch (error) {
+                console.error('Error loading blocked apps:', error);
+            }
+        }
+
+        async function loadBlockedWebsites() {
+            try {
+                const response = await fetch(`${API_URL}/monitoring/blocked-websites`);
+                const websites = await response.json();
+                renderBlockedWebsites(websites);
+            } catch (error) {
+                console.error('Error loading blocked websites:', error);
+            }
+        }
+
+        async function loadLoginEvents() {
+            try {
+                const agentId = document.getElementById('loginAgentFilter')?.value || '';
+                let url = `${API_URL}/monitoring/login-events?limit=100`;
+                if (agentId) url += `&agent_id=${agentId}`;
+                const response = await fetch(url);
+                const events = await response.json();
+                renderLoginEvents(events);
+            } catch (error) {
+                console.error('Error loading login events:', error);
+            }
+        }
+
+        async function loadTimeEntries() {
+            try {
+                const agentId = document.getElementById('timeAgentFilter')?.value || '';
+                let url = `${API_URL}/monitoring/time-entries?limit=100`;
+                if (agentId) url += `&agent_id=${agentId}`;
+                const response = await fetch(url);
+                const entries = await response.json();
+                renderTimeEntries(entries);
+            } catch (error) {
+                console.error('Error loading time entries:', error);
+            }
+        }
+
+        async function loadCommEvents() {
+            try {
+                const agentId = document.getElementById('commAgentFilter')?.value || '';
+                let url = `${API_URL}/monitoring/comm-events?limit=100`;
+                if (agentId) url += `&agent_id=${agentId}`;
+                const response = await fetch(url);
+                const events = await response.json();
+                renderCommEvents(events);
+            } catch (error) {
+                console.error('Error loading communication events:', error);
+            }
+        }
+
+        async function loadProductivity() {
+            try {
+                const agentId = document.getElementById('prodAgentFilter')?.value || '';
+                let url = `${API_URL}/monitoring/productivity?limit=100`;
+                if (agentId) url += `&agent_id=${agentId}`;
+                const response = await fetch(url);
+                const scores = await response.json();
+                renderProductivity(scores);
+            } catch (error) {
+                console.error('Error loading productivity:', error);
+            }
+        }
+
+        async function loadAlerts() {
+            try {
+                const agentId = document.getElementById('alertAgentFilter')?.value || '';
+                let url = `${API_URL}/monitoring/alerts?limit=100`;
+                if (agentId) url += `&agent_id=${agentId}`;
+                const response = await fetch(url);
+                const alerts = await response.json();
+                renderAlerts(alerts);
+            } catch (error) {
+                console.error('Error loading alerts:', error);
+            }
+        }
+
+        async function loadDLPEvents() {
+            try {
+                const agentId = document.getElementById('dlpAgentFilter')?.value || '';
+                let url = `${API_URL}/monitoring/dlp-events?limit=100`;
+                if (agentId) url += `&agent_id=${agentId}`;
+                const response = await fetch(url);
+                const events = await response.json();
+                renderDLPEvents(events);
+            } catch (error) {
+                console.error('Error loading DLP events:', error);
+            }
+        }
+
+        async function loadAgentActivity(agentId) {
+            try {
+                const response = await fetch(`${API_URL}/activities/summary/${agentId}?days=1`);
+                const data = await response.json();
+                renderActivityChart(data.summary);
+            } catch (error) {
+                console.error('Error loading activity:', error);
+            }
+        }
+
+        async function loadAgentScreenshots(agentId) {
+            try {
+                const response = await fetch(`${API_URL}/screenshots/agent/${agentId}?limit=20`);
+                const data = await response.json();
+                renderScreenshots(data.screenshots, 'agentScreenshots');
+            } catch (error) {
+                console.error('Error loading agent screenshots:', error);
+            }
+        }
+
+        // Render Functions
+        function renderAgents() {
+            const container = document.getElementById('agentsList');
+
+            if (agents.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No Agents Connected</h3>
+                        <p>Install the agent on employee machines to start monitoring</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = agents.map(agent => `
+                <div class="card agent-card" onclick="showAgentDetails('${agent.id}')">
+                    <div class="card-header">
+                        <span class="card-title">${agent.employee_name || agent.pc_name}</span>
+                        <span class="agent-status ${agent.status}">
+                            <span class="status-dot ${agent.status === 'offline' ? 'offline' : ''}"></span>
+                            ${agent.status}
+                        </span>
+                    </div>
+                    <div class="agent-info">
+                        <div class="agent-info-row">
+                            <span class="agent-info-label">PC Name</span>
+                            <span class="agent-info-value">${agent.pc_name}</span>
+                        </div>
+                        <div class="agent-info-row">
+                            <span class="agent-info-label">Last Seen</span>
+                            <span class="agent-info-value">${formatDate(agent.last_seen)}</span>
+                        </div>
+                        <div class="agent-info-row">
+                            <span class="agent-info-label">Activities</span>
+                            <span class="agent-info-value">${agent.activity_count || 0}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderScreenshots(screenshots, containerId) {
+            const container = document.getElementById(containerId);
+            if (!screenshots || screenshots.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>No Screenshots</h3></div>`;
+                return;
+            }
+            container.innerHTML = screenshots.map(s => `
+                <div class="screenshot-item" onclick="viewScreenshot(${s.id}, '${s.filename}')">
+                    <img src="${API_URL}/screenshots/image/${s.id}" alt="Screenshot">
+                    <div class="screenshot-time">${formatDate(s.captured_at)}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderActivities(activities) {
+            const container = document.getElementById('activityList');
+            if (!activities || activities.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>No Activity Data</h3></div>`;
+                return;
+            }
+            container.innerHTML = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Agent</th>
+                            <th>Application</th>
+                            <th>Window Title</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${activities.map(a => `
+                            <tr>
+                                <td>${formatDate(a.timestamp)}</td>
+                                <td>${a.employee_name || a.pc_name || 'Unknown'}</td>
+                                <td>${a.app_name || 'Unknown'}</td>
+                                <td>${(a.window_title || '').substring(0, 50)}</td>
+                                <td>${a.duration_seconds ? formatDuration(a.duration_seconds) : '-'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function renderKeystrokes(keystrokes) {
+            const container = document.getElementById('keystrokesList');
+            if (!keystrokes || keystrokes.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>No Keystroke Data</h3></div>`;
+                return;
+            }
+            container.innerHTML = keystrokes.map(k => `
+                <div class="log-item">
+                    <div class="log-icon" style="background: rgba(59, 130, 246, 0.2);">⌨️</div>
+                    <div class="log-details">
+                        <div class="log-title">${k.app_name || 'Unknown App'}</div>
+                        <div class="log-subtitle">${formatDate(k.timestamp)} | ${k.key_count || 0} keys</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderClipboard(clipboard) {
+            const container = document.getElementById('clipboardList');
+            if (!clipboard || clipboard.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>No Clipboard Data</h3></div>`;
+                return;
+            }
+            container.innerHTML = clipboard.map(c => `
+                <div class="log-item">
+                    <div class="log-icon" style="background: rgba(139, 92, 246, 0.2);">📋</div>
+                    <div class="log-details">
+                        <div class="log-title">${(c.content || '').substring(0, 100)}${(c.content || '').length > 100 ? '...' : ''}</div>
+                        <div class="log-subtitle">${formatDate(c.timestamp)} | ${c.content_type || 'text'}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderWebHistory(history) {
+            const container = document.getElementById('webHistoryList');
+            if (!history || history.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>No Web History</h3></div>`;
+                return;
+            }
+            container.innerHTML = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Agent</th>
+                            <th>Browser</th>
+                            <th>URL</th>
+                            <th>Title</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${history.map(h => `
+                            <tr>
+                                <td>${formatDate(h.timestamp)}</td>
+                                <td>${h.employee_name || 'Unknown'}</td>
+                                <td>${h.browser || 'Unknown'}</td>
+                                <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${h.url || ''}</td>
+                                <td>${(h.title || '').substring(0, 40)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function renderFileEvents(events) {
+            const container = document.getElementById('fileEventsList');
+            if (!events || events.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>No File Events</h3></div>`;
+                return;
+            }
+            const icons = { created: '📄', modified: '✏️', deleted: '🗑️', renamed: '📝' };
+            container.innerHTML = events.map(e => `
+                <div class="log-item">
+                    <div class="log-icon" style="background: rgba(34, 197, 94, 0.2);">${icons[e.action] || '📁'}</div>
+                    <div class="log-details">
+                        <div class="log-title">${e.file_path || 'Unknown'}</div>
+                        <div class="log-subtitle">${formatDate(e.timestamp)} | ${e.action || 'unknown'}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderPrintJobs(jobs) {
+            const container = document.getElementById('printJobsList');
+            if (!jobs || jobs.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>No Print Jobs</h3></div>`;
+                return;
+            }
+            container.innerHTML = jobs.map(j => `
+                <div class="log-item">
+                    <div class="log-icon" style="background: rgba(249, 115, 22, 0.2);">🖨️</div>
+                    <div class="log-details">
+                        <div class="log-title">${j.document_name || 'Unknown Document'}</div>
+                        <div class="log-subtitle">${formatDate(j.timestamp)} | ${j.printer_name || 'Unknown Printer'} | ${j.pages || '?'} pages</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderUSBPolicies(policies) {
+            const container = document.getElementById('usbPoliciesList');
+            if (!policies || policies.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>No USB Policies</h3></div>`;
+                return;
+            }
+            const labels = { storage: 'USB Storage', phone: 'Mobile Phones', all: 'All USB Devices' };
+            container.innerHTML = policies.map(p => `
+                <div class="policy-item">
+                    <div class="policy-info">
+                        <span class="policy-name">${labels[p.device_class] || p.device_class}</span>
+                        <span class="policy-target">${p.employee_name || 'All Agents'}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <label class="toggle">
+                            <input type="checkbox" ${p.allowed ? 'checked' : ''} onchange="toggleUSBPolicy(${p.id}, this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <button class="btn btn-danger btn-sm" onclick="deleteUSBPolicy(${p.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderUSBLogs(logs) {
+            const container = document.getElementById('usbLogsList');
+            if (!logs || logs.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>No USB Activity</h3></div>`;
+                return;
+            }
+            const icons = { connected: '🔌', disconnected: '⏏️', blocked: '🚫' };
+            container.innerHTML = logs.map(log => `
+                <div class="log-item">
+                    <div class="log-icon ${log.action}">${icons[log.action] || '📟'}</div>
+                    <div class="log-details">
+                        <div class="log-title">${log.device_name || 'Unknown Device'}</div>
+                        <div class="log-subtitle">${formatDate(log.timestamp)}</div>
+                    </div>
+                    <span style="color: ${log.action === 'blocked' ? '#ef4444' : '#22c55e'}; font-size: 12px;">
+                        ${log.action.toUpperCase()}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        function renderBlockedApps(apps) {
+            const container = document.getElementById('blockedAppsList');
+            if (!apps || apps.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>No Blocked Applications</h3></div>`;
+                return;
+            }
+            container.innerHTML = apps.map(a => `
+                <div class="policy-item">
+                    <div class="policy-info">
+                        <span class="policy-name">🚫 ${a.app_name}</span>
+                        <span class="policy-target">${a.employee_name || 'All Agents'}</span>
+                    </div>
+                    <button class="btn btn-success btn-sm" onclick="unblockApp(${a.id})">Unblock</button>
+                </div>
+            `).join('');
+        }
+
+        function renderBlockedWebsites(websites) {
+            const container = document.getElementById('blockedWebsitesList');
+            if (!websites || websites.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>No Blocked Websites</h3></div>`;
+                return;
+            }
+            container.innerHTML = websites.map(w => `
+                <div class="policy-item">
+                    <div class="policy-info">
+                        <span class="policy-name">🚫 ${w.domain}</span>
+                        <span class="policy-target">${w.employee_name || 'All Agents'}</span>
+                    </div>
+                    <button class="btn btn-success btn-sm" onclick="unblockWebsite(${w.id})">Unblock</button>
+                </div>
+            `).join('');
+        }
+
+        function renderLoginEvents(events) {
+            const container = document.getElementById('loginEventsList');
+            if (!events || events.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>No Login Events</h3></div>`;
+                return;
+            }
+            const icons = { login: '🔓', logout: '🔒', lock: '🔐', unlock: '🔑' };
+            container.innerHTML = events.map(e => `
+                <div class="log-item">
+                    <div class="log-icon" style="background: rgba(59, 130, 246, 0.2);">${icons[e.event_type] || '👤'}</div>
+                    <div class="log-details">
+                        <div class="log-title">${e.event_type?.toUpperCase() || 'Unknown'}</div>
+                        <div class="log-subtitle">${formatDate(e.timestamp)} | ${e.employee_name || 'Unknown'}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderTimeEntries(entries) {
+            const container = document.getElementById('timeEntriesList');
+            if (!entries || entries.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>No Time Entries</h3></div>`;
+                return;
+            }
+            container.innerHTML = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Agent</th>
+                            <th>Clock In</th>
+                            <th>Clock Out</th>
+                            <th>Total Hours</th>
+                            <th>Break Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${entries.map(e => `
+                            <tr>
+                                <td>${e.date || '-'}</td>
+                                <td>${e.employee_name || 'Unknown'}</td>
+                                <td>${e.clock_in || '-'}</td>
+                                <td>${e.clock_out || '-'}</td>
+                                <td>${e.total_hours ? e.total_hours.toFixed(2) + 'h' : '-'}</td>
+                                <td>${e.break_minutes ? e.break_minutes + 'm' : '-'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function renderCommEvents(events) {
+            const container = document.getElementById('commEventsList');
+            if (!events || events.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>No Communication Events</h3></div>`;
+                return;
+            }
+            const icons = { email: '📧', im: '💬', call: '📞' };
+            container.innerHTML = events.map(e => `
+                <div class="log-item">
+                    <div class="log-icon" style="background: rgba(236, 72, 153, 0.2);">${icons[e.comm_type] || '💬'}</div>
+                    <div class="log-details">
+                        <div class="log-title">${e.app_name || 'Unknown'} - ${e.comm_type || 'unknown'}</div>
+                        <div class="log-subtitle">${formatDate(e.timestamp)} | ${e.employee_name || 'Unknown'}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderProductivity(scores) {
+            const container = document.getElementById('productivityList');
+            if (!scores || scores.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>No Productivity Data</h3></div>`;
+                return;
+            }
+            container.innerHTML = `<div class="grid">${scores.map(s => `
+                <div class="stat-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div class="stat-label">${s.employee_name || 'Unknown'}</div>
+                            <div class="stat-value">${s.score || 0}%</div>
+                        </div>
+                        <div class="productivity-score grade-${s.grade?.[0] || 'C'}">${s.grade || 'C'}</div>
+                    </div>
+                    <div class="risk-bar">
+                        <div class="risk-fill ${s.score >= 70 ? 'risk-low' : s.score >= 40 ? 'risk-medium' : 'risk-high'}" style="width: ${s.score || 0}%"></div>
+                    </div>
+                    <div class="stat-label" style="margin-top: 10px;">${formatDate(s.timestamp)}</div>
+                </div>
+            `).join('')}</div>`;
+        }
+
+        function renderAlerts(alerts) {
+            const container = document.getElementById('alertsList');
+            if (!alerts || alerts.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>No Alerts</h3></div>`;
+                return;
+            }
+            container.innerHTML = alerts.map(a => `
+                <div class="log-item">
+                    <div class="log-icon" style="background: rgba(239, 68, 68, 0.2);">⚠️</div>
+                    <div class="log-details">
+                        <div class="log-title">${a.rule_name || 'Unknown Alert'}</div>
+                        <div class="log-subtitle">${formatDate(a.timestamp)} | Risk: ${a.risk_score || 0}</div>
+                    </div>
+                    <span class="badge ${a.severity === 'critical' ? 'badge-critical' : a.severity === 'high' ? 'badge-high' : 'badge-medium'}">
+                        ${(a.severity || 'medium').toUpperCase()}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        function renderDLPEvents(events) {
+            const container = document.getElementById('dlpEventsList');
+            if (!events || events.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>No DLP Events</h3></div>`;
+                return;
+            }
+            container.innerHTML = events.map(e => `
+                <div class="log-item">
+                    <div class="log-icon" style="background: rgba(239, 68, 68, 0.2);">🔒</div>
+                    <div class="log-details">
+                        <div class="log-title">${e.pattern_name || 'Sensitive Data Detected'}</div>
+                        <div class="log-subtitle">${formatDate(e.timestamp)} | ${e.source || 'Unknown source'}</div>
+                    </div>
+                    <span class="badge badge-critical">DLP</span>
+                </div>
+            `).join('');
+        }
+
+        function renderActivityChart(activities) {
+            const container = document.getElementById('activityChart');
+            if (!activities || activities.length === 0) {
+                container.innerHTML = `<div class="empty-state"><h3>No Activity Data</h3></div>`;
+                return;
+            }
+            const maxSeconds = Math.max(...activities.map(a => a.total_seconds));
+            container.innerHTML = activities.map(a => `
+                <div class="activity-bar">
+                    <span class="activity-name" title="${a.app_name}">${a.app_name}</span>
+                    <div class="activity-progress">
+                        <div class="activity-fill" style="width: ${(a.total_seconds / maxSeconds) * 100}%"></div>
+                    </div>
+                    <span class="activity-time">${a.total_formatted}</span>
+                </div>
+            `).join('');
+        }
+
+        // Modal Functions
+        function showAgentDetails(agentId) {
+            currentAgentId = agentId;
+            const agent = agents.find(a => a.id === agentId);
+            document.getElementById('modalAgentName').textContent = agent?.employee_name || agent?.pc_name || 'Agent';
+            document.getElementById('agentModal').classList.add('active');
+            loadAgentActivity(agentId);
+            loadAgentScreenshots(agentId);
+        }
+
+        function closeModal() {
+            document.getElementById('agentModal').classList.remove('active');
+            currentAgentId = null;
+        }
+
+        function showAddUSBPolicyModal() {
+            document.getElementById('usbPolicyModal').classList.add('active');
+        }
+
+        function closeUSBPolicyModal() {
+            document.getElementById('usbPolicyModal').classList.remove('active');
+        }
+
+        function showBlockAppModal() {
+            document.getElementById('blockAppModal').classList.add('active');
+        }
+
+        function closeBlockAppModal() {
+            document.getElementById('blockAppModal').classList.remove('active');
+        }
+
+        function showBlockWebsiteModal() {
+            document.getElementById('blockWebsiteModal').classList.add('active');
+        }
+
+        function closeBlockWebsiteModal() {
+            document.getElementById('blockWebsiteModal').classList.remove('active');
+        }
+
+        function viewScreenshot(id, filename) {
+            document.getElementById('screenshotModalTitle').textContent = filename;
+            document.getElementById('screenshotModalImage').src = `${API_URL}/screenshots/image/${id}`;
+            document.getElementById('screenshotModal').classList.add('active');
+        }
+
+        function closeScreenshotModal() {
+            document.getElementById('screenshotModal').classList.remove('active');
+        }
+
+        // Action Functions
+        function requestScreenshot() {
+            if (!currentAgentId) return;
+            ws.send(JSON.stringify({ type: 'request_screenshot', agent_id: currentAgentId }));
+            showNotification('Screenshot requested', 'info');
+        }
+
+        async function saveUSBPolicy() {
+            const deviceClass = document.getElementById('usbPolicyDeviceClass').value;
+            const agentId = document.getElementById('usbPolicyAgent').value || null;
+            const allowed = document.getElementById('usbPolicyAllowed').checked;
+
+            try {
+                const response = await fetch(`${API_URL}/usb/policies`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ agent_id: agentId, device_class: deviceClass, allowed })
+                });
+                if (response.ok) {
+                    showNotification('Policy saved', 'success');
+                    closeUSBPolicyModal();
+                    loadUSBPolicies();
+                }
+            } catch (error) {
+                showNotification('Error saving policy', 'error');
+            }
+        }
+
+        async function toggleUSBPolicy(id, allowed) {
+            try {
+                await fetch(`${API_URL}/usb/policies/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ allowed })
+                });
+                showNotification('Policy updated', 'success');
+            } catch (error) {
+                showNotification('Error updating policy', 'error');
+            }
+        }
+
+        async function deleteUSBPolicy(id) {
+            if (!confirm('Delete this policy?')) return;
+            try {
+                await fetch(`${API_URL}/usb/policies/${id}`, { method: 'DELETE' });
+                showNotification('Policy deleted', 'success');
+                loadUSBPolicies();
+            } catch (error) {
+                showNotification('Error deleting policy', 'error');
+            }
+        }
+
+        async function saveBlockedApp() {
+            const appName = document.getElementById('blockAppName').value;
+            const agentId = document.getElementById('blockAppAgent').value || null;
+            if (!appName) return showNotification('Enter app name', 'error');
+
+            try {
+                const response = await fetch(`${API_URL}/monitoring/blocked-apps`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ agent_id: agentId, app_name: appName })
+                });
+                if (response.ok) {
+                    showNotification('App blocked', 'success');
+                    closeBlockAppModal();
+                    loadBlockedApps();
+                    // Notify agent
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ type: 'block_app', agent_id: agentId, app_name: appName }));
+                    }
+                }
+            } catch (error) {
+                showNotification('Error blocking app', 'error');
+            }
+        }
+
+        async function unblockApp(id) {
+            try {
+                await fetch(`${API_URL}/monitoring/blocked-apps/${id}`, { method: 'DELETE' });
+                showNotification('App unblocked', 'success');
+                loadBlockedApps();
+            } catch (error) {
+                showNotification('Error unblocking app', 'error');
+            }
+        }
+
+        async function saveBlockedWebsite() {
+            const domain = document.getElementById('blockWebsiteDomain').value;
+            const agentId = document.getElementById('blockWebsiteAgent').value || null;
+            if (!domain) return showNotification('Enter domain', 'error');
+
+            try {
+                const response = await fetch(`${API_URL}/monitoring/blocked-websites`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ agent_id: agentId, domain: domain })
+                });
+                if (response.ok) {
+                    showNotification('Website blocked', 'success');
+                    closeBlockWebsiteModal();
+                    loadBlockedWebsites();
+                    // Notify agent
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ type: 'block_website', agent_id: agentId, domain: domain }));
+                    }
+                }
+            } catch (error) {
+                showNotification('Error blocking website', 'error');
+            }
+        }
+
+        async function unblockWebsite(id) {
+            try {
+                await fetch(`${API_URL}/monitoring/blocked-websites/${id}`, { method: 'DELETE' });
+                showNotification('Website unblocked', 'success');
+                loadBlockedWebsites();
+            } catch (error) {
+                showNotification('Error unblocking website', 'error');
+            }
+        }
+
+        // Utility Functions
+        function formatDate(dateStr) {
+            if (!dateStr) return 'Never';
+            const date = new Date(dateStr);
+            return date.toLocaleString();
+        }
+
+        function formatDuration(seconds) {
+            if (seconds < 60) return `${seconds}s`;
+            if (seconds < 3600) return `${Math.floor(seconds / 60)}m`;
+            return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        // Tab Navigation
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabName = this.dataset.tab;
+                const modalTab = this.dataset.modalTab;
+
+                if (tabName) {
+                    document.querySelectorAll('.tab[data-tab]').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+                    this.classList.add('active');
+                    document.getElementById(tabName).style.display = 'block';
+
+                    // Load data for tab
+                    switch(tabName) {
+                        case 'activity': loadActivities(); break;
+                        case 'screenshots': loadScreenshots(); break;
+                        case 'keystrokes': loadKeystrokes(); break;
+                        case 'clipboard': loadClipboard(); break;
+                        case 'webhistory': loadWebHistory(); break;
+                        case 'files': loadFileEvents(); break;
+                        case 'printjobs': loadPrintJobs(); break;
+                        case 'usb': loadUSBPolicies(); loadUSBLogs(); break;
+                        case 'appblock': loadBlockedApps(); break;
+                        case 'webblock': loadBlockedWebsites(); break;
+                        case 'logins': loadLoginEvents(); break;
+                        case 'timetrack': loadTimeEntries(); break;
+                        case 'comms': loadCommEvents(); break;
+                        case 'productivity': loadProductivity(); break;
+                        case 'alerts': loadAlerts(); break;
+                        case 'dlp': loadDLPEvents(); break;
+                    }
+                }
+
+                if (modalTab) {
+                    document.querySelectorAll('.tab[data-modal-tab]').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.modal-tab-content').forEach(c => c.style.display = 'none');
+                    this.classList.add('active');
+                    document.getElementById(modalTab === 'activity' ? 'modalActivity' : 'modalScreenshots').style.display = 'block';
+                }
+            });
+        });
+
+        // Close modals on backdrop click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) this.classList.remove('active');
+            });
+        });
+
+        // Initialize
+        initWebSocket();
+        loadAgents();
+        document.getElementById('activityDateFilter').valueAsDate = new Date();
+    </script>
+</body>
+</html>

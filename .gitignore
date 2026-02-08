@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+
+# Build outputs
+admin-panel/dist/
+agent/dist/
+agent/build/
+agent/installer_output/
+
+# Database
+admin-panel/data/*.db
+admin-panel/data/*.db-shm
+admin-panel/data/*.db-wal
+
+# Screenshots
+admin-panel/screenshots/*
+!admin-panel/screenshots/.gitkeep
+
+# Logs
+*.log
+server_out.txt
+server_err.txt
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Sandbox/temp files
+*.wsb
+nul
+tmpclaude-*
