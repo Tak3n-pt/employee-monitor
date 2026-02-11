@@ -11,7 +11,9 @@ function startServer() {
         const serverPath = path.join(__dirname, 'server', 'index.js');
         serverProcess = spawn('node', [serverPath], {
             stdio: ['pipe', 'pipe', 'pipe'],
-            shell: true
+            shell: true,
+            cwd: __dirname,
+            env: { ...process.env, ELECTRON_APP_PATH: __dirname }
         });
 
         serverProcess.stdout.on('data', (data) => {
@@ -75,9 +77,23 @@ app.whenReady().then(() => {
     // Start server first, then create window after short delay
     startServer();
 
-    setTimeout(() => {
-        createWindow();
-    }, 1500); // Wait for server to start
+    // Wait for server to actually be ready before opening window
+    function waitForServer(retries = 20) {
+        const http = require('http');
+        const req = http.get('http://localhost:3847/api/health', (res) => {
+            if (res.statusCode === 200) {
+                createWindow();
+            } else if (retries > 0) {
+                setTimeout(() => waitForServer(retries - 1), 500);
+            }
+        });
+        req.on('error', () => {
+            if (retries > 0) {
+                setTimeout(() => waitForServer(retries - 1), 500);
+            }
+        });
+    }
+    setTimeout(() => waitForServer(), 1000);
 
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) {
