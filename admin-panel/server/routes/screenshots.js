@@ -5,8 +5,11 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Configure multer for screenshot uploads
-const screenshotsDir = path.join(__dirname, '..', '..', 'screenshots');
+// Configure multer for screenshot uploads - writable location
+const isPackaged = __dirname.includes('app.asar');
+const screenshotsDir = isPackaged
+    ? path.join(process.env.APPDATA || path.join(require('os').homedir(), 'AppData', 'Roaming'), 'employee-monitor-admin', 'screenshots')
+    : path.join(__dirname, '..', '..', 'screenshots');
 if (!fs.existsSync(screenshotsDir)) {
     fs.mkdirSync(screenshotsDir, { recursive: true });
 }

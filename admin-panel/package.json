@@ -42,7 +42,11 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
     },
-    "asar": false
+    "asarUnpack": [
+      "node_modules/better-sqlite3/**/*",
+      "server/**/*",
+      "public-new/**/*"
+    ]
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

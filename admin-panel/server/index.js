@@ -34,11 +34,23 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // Apply auth middleware to all routes
 app.use(requireAuth);
 
+// Screenshots directory - writable location
+const isPackaged = __dirname.includes('app.asar');
+const screenshotsPath = isPackaged
+    ? path.join(process.env.APPDATA || path.join(require('os').homedir(), 'AppData', 'Roaming'), 'employee-monitor-admin', 'screenshots')
+    : path.join(__dirname, '..', 'screenshots');
+const fs = require('fs');
+if (!fs.existsSync(screenshotsPath)) fs.mkdirSync(screenshotsPath, { recursive: true });
+
 // Serve static files (for screenshots)
-app.use('/screenshots', express.static(path.join(__dirname, '..', 'screenshots')));
+app.use('/screenshots', express.static(screenshotsPath));
 
 // Serve the dashboard UI (new React build)
-app.use(express.static(path.join(__dirname, '..', 'public-new')));
+// When packaged, asarUnpack puts files in app.asar.unpacked
+const publicPath = isPackaged
+    ? path.join(__dirname.replace('app.asar', 'app.asar.unpacked'), '..', 'public-new')
+    : path.join(__dirname, '..', 'public-new');
+app.use(express.static(publicPath));
 
 // API Routes
 app.use('/api/auth', authRouter);
@@ -238,7 +250,7 @@ app.get('*', (req, res, next) => {
     if (req.path.startsWith('/api/')) {
         return next();
     }
-    res.sendFile(path.join(__dirname, '..', 'public-new', 'index.html'));
+    res.sendFile(path.join(publicPath, 'index.html'));
 });
 
 // Error handling middleware

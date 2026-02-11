@@ -3,13 +3,17 @@ const bcrypt = require('bcryptjs');
 const path = require('path');
 const fs = require('fs');
 
-// Database file location
-const dbPath = path.join(__dirname, '..', 'data', 'monitor.db');
+// Database file location - use AppData in production, local data/ in dev
+const isPackaged = __dirname.includes('app.asar');
+const appDataDir = isPackaged
+    ? path.join(process.env.APPDATA || path.join(require('os').homedir(), 'AppData', 'Roaming'), 'employee-monitor-admin')
+    : path.join(__dirname, '..', 'data');
+
+const dbPath = path.join(appDataDir, 'monitor.db');
 
 // Ensure data directory exists
-const dataDir = path.dirname(dbPath);
-if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
+if (!fs.existsSync(appDataDir)) {
+    fs.mkdirSync(appDataDir, { recursive: true });
 }
 
 // Initialize database

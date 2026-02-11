@@ -1,34 +1,13 @@
 const { app, BrowserWindow, ipcMain, shell } = require('electron');
-const { spawn } = require('child_process');
 const path = require('path');
 
 let mainWindow;
-let serverProcess = null;
 
-// Start server as separate Node.js process (avoids native module issues)
+// Start server in-process (works inside asar and without external node)
 function startServer() {
     try {
-        const serverPath = path.join(__dirname, 'server', 'index.js');
-        serverProcess = spawn('node', [serverPath], {
-            stdio: ['pipe', 'pipe', 'pipe'],
-            shell: true,
-            cwd: __dirname,
-            env: { ...process.env, ELECTRON_APP_PATH: __dirname }
-        });
-
-        serverProcess.stdout.on('data', (data) => {
-            console.log(`Server: ${data}`);
-        });
-
-        serverProcess.stderr.on('data', (data) => {
-            console.error(`Server Error: ${data}`);
-        });
-
-        serverProcess.on('close', (code) => {
-            console.log(`Server process exited with code ${code}`);
-        });
-
-        console.log('Server started as child process');
+        require('./server/index.js');
+        console.log('Server started in-process');
     } catch (error) {
         console.error('Server startup error:', error);
     }
@@ -109,10 +88,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('quit', () => {
-    // Kill server process when Electron exits
-    if (serverProcess) {
-        serverProcess.kill();
-    }
+    // Server runs in-process, will exit with the app
 });
 
 // IPC handlers for renderer process communication
