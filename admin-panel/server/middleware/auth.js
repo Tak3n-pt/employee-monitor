@@ -11,6 +11,7 @@ const SKIP_AUTH_PATHS = [
     '/api/screenshots/image/',
     '/api/monitoring/data',
     '/api/alerts',
+    '/api/usb/log',
     '/api/health',
 ];
 

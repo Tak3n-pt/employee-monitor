@@ -39,6 +39,35 @@ router.post('/', (req, res) => {
     }
 });
 
+// Get all activities (with optional agent_id filter)
+router.get('/', (req, res) => {
+    try {
+        const { agent_id, limit = 100 } = req.query;
+
+        let query = `
+            SELECT a.*, ag.employee_name, ag.pc_name
+            FROM activities a
+            LEFT JOIN agents ag ON a.agent_id = ag.id
+            WHERE 1=1
+        `;
+        const params = [];
+
+        if (agent_id) {
+            query += ' AND a.agent_id = ?';
+            params.push(agent_id);
+        }
+
+        query += ' ORDER BY a.created_at DESC LIMIT ?';
+        params.push(parseInt(limit));
+
+        const activities = db.prepare(query).all(...params);
+        res.json(activities);
+    } catch (error) {
+        console.error('Get all activities error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Get activities for an agent
 router.get('/agent/:agentId', (req, res) => {
     try {
